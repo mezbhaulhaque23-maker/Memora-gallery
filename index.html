@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memora — Our Memories, Forever</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@300;400&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    min-height: 100vh;
+    background: #0c0b13;
+    color: #f4f1ff;
+    font-family: "Poppins", Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+/* ---------- Background ---------- */
+
+.background {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 45%, #1d1530 0%, #100e19 48%, #0a0910 100%);
+}
+
+.glow { position: absolute; border-radius: 50%; filter: blur(110px); pointer-events: none; }
+.glow-one   { width: 420px; height: 420px; background: rgba(125, 67, 255, 0.22); top: -140px; left: -100px; }
+.glow-two   { width: 460px; height: 460px; background: rgba(105, 55, 190, 0.18); right: -150px; top: 28%; }
+.glow-three { width: 520px; height: 300px; background: rgba(139, 92, 246, 0.2);  bottom: -140px; left: 30%; }
+
+.cloud {
+    position: absolute;
+    background: #2a1f45;
+    opacity: 0.45;
+    filter: blur(40px);
+    border-radius: 50%;
+}
+.cloud-left   { width: 380px; height: 190px; left: -190px; bottom: 14%; }
+.cloud-right  { width: 380px; height: 190px; right: -190px; top: 12%; }
+.cloud-bottom { width: 560px; height: 150px; bottom: -90px; left: 22%; background: #34214b; opacity: 0.4; }
+
+/* ---------- Sparkles ---------- */
+
+.sparkles span {
+    position: absolute;
+    color: #b794ff;
+    opacity: 0.6;
+    text-shadow: 0 0 10px rgba(167, 122, 255, 0.9);
+    animation: twinkle 3.2s ease-in-out infinite alternate;
+}
+
+.sparkles span:nth-child(1)  { top: 9%;  left: 10%;  font-size: 22px; }
+.sparkles span:nth-child(2)  { top: 16%; right: 12%; font-size: 16px; animation-delay: 1s; }
+.sparkles span:nth-child(3)  { top: 44%; left: 5%;   font-size: 14px; animation-delay: 1.6s; }
+.sparkles span:nth-child(4)  { top: 62%; right: 7%;  font-size: 24px; animation-delay: 0.6s; }
+.sparkles span:nth-child(5)  { top: 12%; left: 52%;  font-size: 12px; animation-delay: 2s; }
+.sparkles span:nth-child(6)  { bottom: 10%; left: 18%; font-size: 18px; animation-delay: 1.2s; }
+.sparkles span:nth-child(7)  { bottom: 14%; right: 24%; font-size: 14px; animation-delay: 0.3s; }
+.sparkles span:nth-child(8)  { top: 36%; right: 30%; font-size: 10px; animation-delay: 2.4s; }
+
+@keyframes twinkle {
+    from { opacity: 0.2; transform: scale(0.75); }
+    to   { opacity: 0.95; transform: scale(1.2); }
+}
+
+/* ---------- Section ---------- */
+
+.gallery-section {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 70px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.gallery-head {
+    text-align: center;
+    margin-bottom: 70px;
+}
+
+.gallery-head h2 {
+    font-family: "Caveat", cursive;
+    font-size: clamp(3rem, 6vw, 4.6rem);
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 0 28px rgba(167, 122, 255, 0.55);
+}
+
+.gallery-head p {
+    margin-top: 12px;
+    font-size: 1rem;
+    font-weight: 300;
+    color: #c7bfe0;
+}
+
+/* ---------- Polaroid grid ---------- */
+
+.polaroids {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 56px 40px;
+    padding: 10px 10px 0;
+}
+
+.polaroid {
+    --tilt: -4deg;
+    --lift: 0px;
+    width: 100%;
+    padding: 12px 12px 18px;
+    background: #efeef5;
+    border-radius: 10px;
+    border: 2px solid rgba(167, 122, 255, 0.85);
+    box-shadow:
+        0 0 22px rgba(139, 92, 246, 0.45),
+        0 20px 40px rgba(0, 0, 0, 0.5);
+    transform: rotate(var(--tilt)) translateY(var(--lift));
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+/* a repeating pattern of tilts so the wall looks hand-placed */
+.polaroid:nth-child(4n+1) { --tilt: -4deg; }
+.polaroid:nth-child(4n+2) { --tilt: 3deg;  --lift: 14px; }
+.polaroid:nth-child(4n+3) { --tilt: -2deg; --lift: -6px; }
+.polaroid:nth-child(4n+4) { --tilt: 5deg;  --lift: 8px; }
+
+.polaroid:hover,
+.polaroid:focus-visible {
+    transform: rotate(0deg) translateY(-8px) scale(1.04);
+    box-shadow:
+        0 0 36px rgba(167, 122, 255, 0.85),
+        0 30px 55px rgba(0, 0, 0, 0.6);
+    outline: none;
+    z-index: 2;
+}
+
+.photo {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 4px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #3b2a5c 0%, #8a6ad8 70%, #1b1326 100%);
+    box-shadow: inset 0 0 30px rgba(20, 10, 50, 0.45);
+}
+
+.photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.caption {
+    margin-top: 12px;
+    min-height: 1.6em;
+    text-align: center;
+    font-family: "Caveat", cursive;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #3b2a66;
+}
+
+/* ---------- Photo viewer ---------- */
+
+.viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(8, 6, 14, 0.82);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.viewer.open {
+    display: flex;
+    animation: viewerFade 0.25s ease;
+}
+
+.viewer.open .viewer-card {
+    animation: cardIn 0.3s ease;
+}
+
+@keyframes viewerFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: scale(0.94) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.viewer-card {
+    max-width: min(94vw, 900px);
+    padding: 14px 14px 20px;
+    background: #efeef5;
+    border-radius: 10px;
+    border: 2px solid rgba(167, 122, 255, 0.9);
+    box-shadow: 0 0 50px rgba(139, 92, 246, 0.7);
+    text-align: center;
+}
+
+/* wraps the big photo so the reaction buttons sit on its bottom-right corner */
+.viewer-photo {
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    line-height: 0;
+    border-radius: 4px;
+}
+
+.viewer-photo img {
+    display: block;
+    max-width: 100%;
+    max-height: min(76vh, calc(100vh - 170px));
+    margin: 0 auto;
+    border-radius: 4px;
+}
+
+/* shown when a photo file cannot be loaded */
+.viewer-photo.broken {
+    width: min(70vw, 420px);
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(180deg, #3b2a5c 0%, #8a6ad8 70%, #1b1326 100%);
+}
+
+.viewer-photo.broken img {
+    visibility: hidden;
+}
+
+.viewer-caption {
+    margin-top: 12px;
+    font-family: "Caveat", cursive;
+    font-size: 1.9rem;
+    color: #3b2a66;
+}
+
+/* Previous / Next / Close buttons */
+
+.viewer .close,
+.viewer .prev,
+.viewer .next {
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(139, 92, 246, 0.25);
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.viewer .close:hover,
+.viewer .prev:hover,
+.viewer .next:hover { background: rgba(139, 92, 246, 0.5); }
+
+.viewer .close:focus-visible,
+.viewer .prev:focus-visible,
+.viewer .next:focus-visible { outline: 2px solid #c9aeff; outline-offset: 3px; }
+
+.viewer .close { top: 20px; right: 20px; }
+.viewer .prev  { left: 20px; top: 50%; transform: translateY(-50%); }
+.viewer .next  { right: 20px; top: 50%; transform: translateY(-50%); }
+
+/* ---------- Reaction buttons (Like, Love, Favorite) ---------- */
+
+.reactions {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 2;
+    display: flex;
+    gap: 10px;
+    line-height: 1;
+}
+
+.react {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    background: rgba(22, 14, 42, 0.42);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    backdrop-filter: blur(10px) saturate(150%);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.2s ease, background 0.25s ease, color 0.25s ease,
+                border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.react .icon {
+    display: block;
+    pointer-events: none;
+}
+
+.react:hover {
+    transform: translateY(-3px) scale(1.1);
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(60, 38, 110, 0.55);
+}
+
+.react:active { transform: scale(0.92); }
+
+.react:focus-visible { outline: 2px solid #c9aeff; outline-offset: 3px; }
+
+/* Like: filled heart, purple */
+.react.like.active {
+    color: #e2d3ff;
+    background: rgba(139, 92, 246, 0.5);
+    border-color: #b794ff;
+    box-shadow: 0 0 18px rgba(167, 122, 255, 0.85), 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Favorite: golden glowing star */
+.react.fav.active {
+    color: #ffd54a;
+    background: rgba(255, 200, 60, 0.22);
+    border-color: #ffd54a;
+    box-shadow: 0 0 20px rgba(255, 213, 74, 0.9), 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.react.fav.active .icon {
+    text-shadow: 0 0 10px rgba(255, 213, 74, 0.95);
+}
+
+/* click animations (the "animate" class is added by JavaScript) */
+.react.animate .icon { animation: iconPop 0.6s ease; }
+.react.fav.animate .icon { animation: starSpin 0.6s ease; }
+
+.react.animate::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    opacity: 0;
+    animation: ripple 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes iconPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.45); }
+    70%  { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+@keyframes starSpin {
+    0%   { transform: rotate(0deg) scale(1); }
+    50%  { transform: rotate(180deg) scale(1.5); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes ripple {
+    0%   { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 0;   transform: scale(1.7); }
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 600px) {
+    .gallery-section { padding-top: 50px; }
+    .gallery-head { margin-bottom: 44px; }
+    .polaroids { grid-template-columns: repeat(2, 1fr); gap: 36px 18px; padding: 0; }
+    .polaroid { padding: 8px 8px 12px; }
+    .caption { font-size: 1.15rem; }
+    .glow { filter: blur(75px); }
+
+    /* viewer: arrows move below the photo so they never cover it */
+    .viewer { padding: 16px 12px 84px; }
+    .viewer-card { max-width: 96vw; padding: 10px 10px 14px; }
+    .viewer-caption { font-size: 1.5rem; }
+    .viewer .prev,
+    .viewer .next { top: auto; bottom: 22px; transform: none; }
+    .viewer .prev { left: 22%; }
+    .viewer .next { right: 22%; }
+    .viewer .close { top: 14px; right: 14px; }
+
+    .reactions { right: 8px; bottom: 8px; gap: 8px; }
+    .react { width: 40px; height: 40px; font-size: 1.2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sparkles span { animation: none; }
+    .polaroid { transition: none; }
+    .viewer.open,
+    .viewer.open .viewer-card,
+    .react.animate .icon,
+    .react.animate::after { animation: none; }
+    .react { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="background">
+    <div class="glow glow-one"></div>
+    <div class="glow glow-two"></div>
+    <div class="glow glow-three"></div>
+    <div class="cloud cloud-left"></div>
+    <div class="cloud cloud-right"></div>
+    <div class="cloud cloud-bottom"></div>
+
+    <div class="sparkles">
+        <span>✦</span><span>✧</span><span>✦</span><span>✧</span>
+        <span>·</span><span>✦</span><span>✧</span><span>·</span>
+    </div>
+</div>
+
+<section class="gallery-section" id="gallery">
+
+    <div class="gallery-head">
+        <h2>Our Gallery</h2>
+        <p id="count">Moments we never want to forget</p>
+    </div>
+
+    <div class="polaroids" id="polaroids"></div>
+
+</section>
+
+<!-- Photo viewer (full-screen) -->
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Photo viewer" aria-hidden="true">
+    <button class="close" id="vClose" aria-label="Close">✕</button>
+    <button class="prev" id="vPrev" aria-label="Previous photo">‹</button>
+
+    <figure class="viewer-card">
+        <div class="viewer-photo" id="vPhoto">
+            <img id="vImg" alt="">
+
+            <!-- Reaction buttons: Like, Love, Favorite -->
+            <div class="reactions" id="reactions">
+                <button type="button" class="react like" data-type="like" aria-pressed="false" aria-label="Like" title="Like"><span class="icon">♡</span></button>
+                <button type="button" class="react fav" data-type="fav" aria-pressed="false" aria-label="Favorite" title="Favorite"><span class="icon">☆</span></button>
+            </div>
+        </div>
+        <figcaption class="viewer-caption" id="vCap"></figcaption>
+    </figure>
+
+    <button class="next" id="vNext" aria-label="Next photo">›</button>
+</div>
+
+<!-- =====================================================================
+     PHOTOS — MANAGE YOUR GALLERY
+     =====================================================================
+     This is the ONLY place you need to edit to change your gallery.
+
+     HOW TO ADD A PHOTO
+       1. Copy one whole block that starts with  <div class="photo-entry">
+          and ends with  </div>
+       2. Paste it below the last photo (before the line "END OF PHOTOS").
+       3. Replace the image link and the caption text.
+
+     HOW TO REMOVE A PHOTO
+       Delete its whole block (from <div class="photo-entry"> to </div>).
+
+     IMAGE LINK
+       - Online link:  https://example.com/my-photo.jpg
+       - File on your computer (inside the "photos" folder):  photos/my-photo.jpg
+
+     CAPTION
+       Write any short text. Leave it empty if you do not want a caption.
+
+     The gallery, the photo count and the image viewer update automatically.
+     ===================================================================== -->
+<section id="photos-data" hidden>
+
+    <!-- PHOTO 1 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.ibb.co/TD7YSLNt/911707104-2626628164476876-2323234159523664730-n.jpg</span>
+        <span class="photo-caption">SCHOOL life er last er dike za kortam!</span>
+    </div>
+
+    <!-- PHOTO 2 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.ibb.co/CK36G4rx/905978026-1519705313468238-137126302359963497-n.jpg</span>
+        <span class="photo-caption">PRE-TEST er age shesh nisshash</span>
+    </div>
+
+    <!-- PHOTO 3 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.ibb.co/Y4XzM9dh/904090107-1454643662695336-4834247868423559537.jpg</span>
+        <span class="photo-caption">SOB KALU EKOTTRE</span>
+    </div>
+
+    <!-- PHOTO 4 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/VsBRpM4G/mubiner-gola-cipa.jpg</span>
+        <span class="photo-caption">MUBIN er gola ciptese soikot</span>
+    </div>
+
+    <!-- PHOTO 5 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/YCn6FHqH/last-day.jpg</span>
+        <span class="photo-caption">Haspatale kahini</span>
+    </div>
+
+    <!-- PHOTO 6 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/kgQrMTnD/dalia.jpg</span>
+        <span class="photo-caption">Test? tate ki? cole gelam DALIA</span>
+    </div>
+
+<!-- PHOTO 7 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/GtLPYhY1/the-chain.jpg</span>
+        <span class="photo-caption">PORIKKHAR somoy e beshi ghurtam!</span>
+    </div>
+
+<!-- PHOTO 8 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/kXr6k5G1/mubin-uthano.jpg</span>
+        <span class="photo-caption">MUBIN ke kidnap er CESHTA</span>
+
+<!-- PHOTO 9 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/c44y1RvX/smmmn.jpg</span>
+        <span class="photo-caption">CENA zay sobaike?</span>
+
+<!-- PHOTO 10 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/2yT4kRVM/MUBIN-er-vobisshot.jpg</span>
+        <span class="photo-caption">MUBIN er vobisshot</span>
+
+<!-- PHOTO 11 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/SsxSBBbT/afa-er-picnic.jpg</span>
+        <span class="photo-caption">Al Faruque Academy te picnic</span>
+
+<!-- PHOTO 12 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/HxFLb6Fj/ekdol-saidpur-bashi.jpg</span>
+        <span class="photo-caption">GIRZA'y ekdol SAIDPUR bashi</span>
+
+<!-- PHOTO 13 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/B6HrwNXD/head-sir-er-samne.jpg</span>
+        <span class="photo-caption">HEAD sir er samne chobi tultesi!</span>
+
+<!-- PHOTO 14 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/yNV3NrzC/haspatal-o-charbo-na.jpg</span>
+        <span class="photo-caption">REL haspatale amader payer choa</span>
+
+<!-- PHOTO 15 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/bYWH0CVX/jatio-sompod.jpg</span>
+        <span class="photo-caption">Jatio sompod curir ceshta!</span>
+
+<!-- PHOTO 16 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/j273d1vb/molbi-rupi-soitan.jpg</span>
+        <span class="photo-caption">MOLBI naki SHOYTAN?</span>
+
+
+<!-- PHOTO 17 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/SNpbYL97/kalu-koi.jpg</span>
+        <span class="photo-caption">KALU koi?</span>
+
+
+<!-- PHOTO 18 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/2SQ6B8yX/cokhe-somossa.jpg</span>
+        <span class="photo-caption">COKHE somossa, ordhek dekhi na</span>
+
+
+<!-- PHOTO 19 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/KzBkQr8D/keno-j-tulsilam.jpg</span>
+        <span class="photo-caption">KENO j tulsilam!</span>
+
+
+<!-- PHOTO 20 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/Z5nLH2t4/lagalagi.jpg</span>
+        <span class="photo-caption">MUBIN vs SOIKOT lagalagi</span>
+
+
+<!-- PHOTO 21 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/DzHF09Fc/mon.jpg</span>
+        <span class="photo-caption">MON amar kemon kemon kore!</span>
+
+
+<!-- PHOTO 22 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/66HcZtg1/cute.jpg</span>
+        <span class="photo-caption">CUTE howar chesta</span>
+
+
+<!-- PHOTO 23 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/2ypZQ9d2/natok.jpg</span>
+        <span class="photo-caption">NATOK kom koro PIO</span>
+
+
+<!-- PHOTO 24 -->
+    <div class="photo-entry">
+        <span class="photo-url">https://i.postimg.cc/0y9HGcZC/khejurer-bici.jpg</span>
+        <span class="photo-caption">KHEJURER bicir hate JOLPAI'er bici</span>
+
+
+
+
+
+
+
+    </div>
+
+
+    <!-- ⬇⬇⬇ PASTE NEW PHOTOS HERE (copy any block above and paste it here) ⬇⬇⬇ -->
+
+
+    <!-- ⬆⬆⬆ END OF PHOTOS ⬆⬆⬆ -->
+
+</section>
+
+<!-- =====================================================================
+     GALLERY SCRIPT — you do not need to edit anything below this line
+     ===================================================================== -->
+<script>
+// Reads every entry from the PHOTOS section above
+const photos = Array.from(document.querySelectorAll("#photos-data .photo-entry"))
+    .map(entry => ({
+        file: entry.querySelector(".photo-url").textContent.trim(),
+        caption: entry.querySelector(".photo-caption").textContent.trim()
+    }))
+    .filter(p => p.file !== "");
+
+const grid = document.getElementById("polaroids");
+const countText = document.getElementById("count");
+
+photos.forEach((p, i) => {
+    const fig = document.createElement("figure");
+    fig.className = "polaroid";
+    fig.tabIndex = 0;
+    fig.setAttribute("role", "button");
+    fig.setAttribute("aria-label", "Open photo " + (i + 1));
+
+    const box = document.createElement("div");
+    box.className = "photo";
+
+    const img = document.createElement("img");
+    img.src = p.file;
+    img.alt = p.caption || "Memora photo " + (i + 1);
+    img.loading = "lazy";
+    img.addEventListener("error", () => img.remove()); // missing file: purple gradient stays
+
+    box.appendChild(img);
+
+    const cap = document.createElement("figcaption");
+    cap.className = "caption";
+    cap.textContent = p.caption || "";
+
+    fig.append(box, cap);
+    fig.addEventListener("click", () => openViewer(i));
+    fig.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openViewer(i); }
+    });
+    grid.appendChild(fig);
+});
+
+countText.textContent = photos.length + " memories and counting";
+
+// ---------- Photo viewer ----------
+const viewer = document.getElementById("viewer");
+const vPhoto = document.getElementById("vPhoto");
+const vImg = document.getElementById("vImg");
+const vCap = document.getElementById("vCap");
+let index = 0;
+
+// show the purple placeholder if a photo file cannot be loaded
+vImg.addEventListener("load", () => vPhoto.classList.remove("broken"));
+vImg.addEventListener("error", () => vPhoto.classList.add("broken"));
+
+function showPhoto(i) {
+    index = (i + photos.length) % photos.length;
+    vPhoto.classList.remove("broken");
+    vImg.src = photos[index].file;
+    vImg.alt = photos[index].caption || "";
+    vCap.textContent = photos[index].caption || "";
+    refreshReactions();
+}
+
+function openViewer(i) {
+    showPhoto(i);
+    viewer.classList.add("open");
+    viewer.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden"; // page behind does not scroll
+}
+
+function closeViewer() {
+    viewer.classList.remove("open");
+    viewer.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+}
+
+document.getElementById("vClose").addEventListener("click", closeViewer);
+document.getElementById("vPrev").addEventListener("click", () => showPhoto(index - 1));
+document.getElementById("vNext").addEventListener("click", () => showPhoto(index + 1));
+viewer.addEventListener("click", e => { if (e.target === viewer) closeViewer(); });
+
+document.addEventListener("keydown", e => {
+    if (!viewer.classList.contains("open")) return;
+    if (e.key === "Escape") closeViewer();
+    if (e.key === "ArrowLeft") showPhoto(index - 1);
+    if (e.key === "ArrowRight") showPhoto(index + 1);
+});
+
+// ---------- Reactions (Like, Love, Favorite) ----------
+// Saved in the browser (localStorage). Every photo has its own reactions,
+// stored under the photo's image link, so they survive refreshing the page.
+const STORAGE_KEY = "memora-reactions-v1";
+const reactionBox = document.getElementById("reactions");
+const reactionButtons = reactionBox.querySelectorAll(".react");
+
+function readReactions() {
+    try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return data && typeof data === "object" ? data : {};
+    } catch (err) {
+        return {};
+    }
+}
+
+function saveReactions() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(reactions));
+    } catch (err) {
+        // storage is full or blocked: reactions still work until the page is closed
+    }
+}
+
+let reactions = readReactions();
+
+function getReactions(photoKey) {
+    const saved = reactions[photoKey] || {};
+    return { like: !!saved.like, fav: !!saved.fav };
+}
+
+// shows the saved reactions of the photo that is currently open
+function refreshReactions() {
+    if (!photos.length) return;
+    const state = getReactions(photos[index].file);
+
+    reactionButtons.forEach(btn => {
+        const type = btn.dataset.type;
+        const on = state[type];
+        const icon = btn.querySelector(".icon");
+
+        btn.classList.toggle("active", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+
+        if (type === "like") icon.textContent = on ? "♥" : "♡";
+        if (type === "fav") icon.textContent = on ? "★" : "☆";
+    });
+}
+
+reactionBox.addEventListener("click", e => {
+    e.stopPropagation(); // never closes the viewer or changes the photo
+
+    const btn = e.target.closest(".react");
+    if (!btn || !photos.length) return;
+
+    const photoKey = photos[index].file;
+    const type = btn.dataset.type;
+    const state = getReactions(photoKey);
+
+    state[type] = !state[type];
+    reactions[photoKey] = state;
+    saveReactions();
+    refreshReactions();
+
+    if (state[type]) {
+        btn.classList.remove("animate");
+        void btn.offsetWidth; // restarts the animation
+        btn.classList.add("animate");
+    }
+});
+
+reactionButtons.forEach(btn => {
+    btn.addEventListener("animationend", () => btn.classList.remove("animate"));
+});
+</script>
+
+
+</body>
+</html>
